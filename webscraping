@@ -1,0 +1,37 @@
+#an attempt to webscrape the top 10 memecoins from https://www.coingecko.com/en/categories/meme-token. failed but on the right track, I think i'm looking at the right elements on the webpage, head hurts too much to lock in
+#for sammy: research beautifulsoup
+#there's alot of ways this can go, but for starters let's have a program that successfuly scrapes and outputs 3 categories by the end of the week, then we work on a paper-trading bot, a rug pull detector, a pump-dump detector, or something else
+
+import requests
+from bs4 import BeautifulSoup
+
+def scrape_top_memecoin_names():
+    url = "https://www.coingecko.com/en/categories/meme-token"
+    try:
+        # Fetch the webpage content
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Ensure the request was successful
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # Locate the table rows containing memecoin data
+        rows = soup.find_all("tr", class_="hover:tw-bg-gray-50 tw-bg-white dark:tw-bg-moon-900 hover:dark:tw-bg-moon-800 tw-text-sm")
+
+        # Extract names of the top 10 memecoins
+        names = []
+        for row in rows[:10]:  # Get only the top 10 rows
+            name = row.find("div", class_="tw-text-gray-700 dark:tw-text-moon-100 tw-font-semibold tw-text-sm tw-leading-5").get_text(strip=True)
+            names.append(name)
+
+        # Display the results
+        print(f"Top 10 Memecoin Names:")
+        for i, name in enumerate(names, start=1):
+            print(f"{i}. {name}")
+
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+
+# Run the function
+scrape_top_memecoin_names()
